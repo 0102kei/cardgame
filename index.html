@@ -315,6 +315,61 @@
         animation: softPulse 1.8s ease-in-out infinite;
       }
 
+      .bank {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(3, 1fr);
+        margin-top: 14px;
+      }
+
+      .bank-card {
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 12px;
+        text-align: center;
+      }
+
+      .bank-card strong {
+        display: block;
+        font-size: 22px;
+        line-height: 1.1;
+      }
+
+      .bank-card span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .bet-controls {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .table-zone {
+        margin-top: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.82);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.42);
+        padding: 12px;
+      }
+
+      .zone-title {
+        margin: 0 0 8px;
+        color: #405069;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .mini-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
       .actions,
       .quick,
       .filters {
@@ -429,6 +484,11 @@
       .game-card p {
         color: var(--muted);
         line-height: 1.7;
+      }
+
+      .open-play {
+        width: 100%;
+        margin-top: 14px;
       }
 
       .badge {
@@ -548,6 +608,12 @@
         backdrop-filter: blur(14px);
       }
 
+      .view-note {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-weight: 850;
+      }
+
       .bottom-nav a {
         border-radius: 8px;
         color: var(--ink);
@@ -624,6 +690,14 @@
           grid-template-columns: 1fr;
         }
 
+        .bank {
+          grid-template-columns: 1fr;
+        }
+
+        .bet-controls {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
         .stats {
           gap: 8px;
         }
@@ -696,6 +770,7 @@
               </div>
               <span id="playTime" class="time">3分</span>
             </div>
+            <div id="bankArea" class="bank"></div>
             <div id="gameArea"></div>
           </div>
         </div>
@@ -704,6 +779,7 @@
 
     <main id="games" class="main main-grid">
       <section>
+        <p class="view-note">ゲーム一覧からカードを選ぶと、上のプレイテーブルにそのゲームが開きます。</p>
         <div class="quick" id="quickActions"></div>
         <div class="filters" id="filters"></div>
         <div class="games" id="gameList"></div>
@@ -805,7 +881,7 @@
       const tableModes = ["対AI", "1台で対戦", "2台で対面", "オンライン"];
       const casinoModes = ["ひとり", "対AI", "オンライン"];
       const games = [
-        game("poker", "ドローポーカー", "定番", "1人", "3分", "ふつう", true, true, "5枚を配って、残すカードを選び、役の強さを狙います。", casinoModes, [["ジョーカーを入れる", "toggle"], ["役の判定", "select", ["標準", "日本の家庭ルール寄り", "ワイルドカード強め"]]]),
+        game("draw-poker", "5枚ドローポーカー", "ポーカー", "1〜2人", "3分", "ふつう", true, true, "お互い5枚ずつ配り、残すカードを選んで交換するポーカーです。", casinoModes, [["ジョーカーを入れる", "toggle"], ["役の判定", "select", ["標準", "日本の家庭ルール寄り", "ワイルドカード強め"]]]),
         game("blackjack", "ブラックジャック", "カジノ", "1人", "2分", "やさしい", true, true, "21を超えないようにカードを引き、ディーラーより強い点を目指します。", casinoModes, [["ディーラーはソフト17で引く", "toggle"], ["ダブルダウンあり", "toggle"]]),
         game("baccarat", "バカラ", "カジノ", "1人", "1分", "やさしい", true, false, "プレイヤー側とバンカー側の、下一桁の点数を比べます。", casinoModes, [["3枚目ルール", "select", ["かんたん", "標準"]]]),
         game("highlow", "ハイ&ロー", "短時間", "1人", "30秒", "やさしい", true, false, "次のカードが今のカードより高いか低いかを当てます。", soloModes, [["同じ数字は当たり", "toggle"]]),
@@ -836,19 +912,25 @@
         game("scorpion", "スコーピオン", "ひとり", "1人", "10分", "むずかしい", false, false, "同じマークでKからAまで並べる、歯ごたえのある一人用ゲームです。", soloModes, [["やさしい配り方", "toggle"]]),
         game("casino-war", "カジノウォー", "カジノ", "1人", "1分", "やさしい", false, false, "1枚勝負でディーラーと比べる、戦争のカジノ版です。", casinoModes, [["サレンダーあり", "toggle"]]),
         game("three-card-poker", "スリーカードポーカー", "カジノ", "1人", "2分", "やさしい", false, true, "3枚の手札で役を作る、短時間で遊べるポーカーです。", casinoModes, [["ペアプラスあり", "toggle"]]),
-        game("texas-holdem", "テキサスホールデム", "ポーカー", "2〜9人", "15分", "むずかしい", false, true, "手札2枚と共通カード5枚で勝負する、人気のポーカーです。", tableModes, [["ノーリミット", "toggle"], ["AIコーチ", "toggle"]]),
+        game("texas-holdem", "テキサスホールデム", "ポーカー", "2〜9人", "15分", "むずかしい", true, true, "手札2枚と共通カード5枚を、3枚・1枚・1枚で開いて勝負するポーカーです。", tableModes, [["ノーリミット", "toggle"], ["AIコーチ", "toggle"]]),
         game("omaha", "オマハポーカー", "ポーカー", "2〜9人", "15分", "むずかしい", false, true, "手札4枚から必ず2枚使う、読み合いが濃いポーカーです。", tableModes, [["ポットリミット", "toggle"]]),
       ];
 
       let selected = games[0];
+      let currentView = "list";
       let category = "すべて";
       let mode = selected.modes[0];
       let aiLevel = "ふつう";
       let notice = "カードを選んでゲームを始めよう";
       let roomCode = "POK-0001";
+      let points = 1000;
+      let bet = 50;
+      let stake = 0;
       let favorites = [];
       let pokerHand = [];
+      let pokerOpponent = [];
       let pokerHeld = [];
+      let texas = {};
       let blackjack = {};
       let highlow = {};
       let warScore = 0;
@@ -904,6 +986,79 @@
         return "ハイカード";
       }
 
+      function pokerScore(hand) {
+        const values = hand.map((card) => card.value).sort((a, b) => a - b);
+        const counts = {};
+        values.forEach((value) => (counts[value] = (counts[value] || 0) + 1));
+        const countValues = Object.values(counts).sort((a, b) => b - a);
+        const flush = hand.length >= 5 && hand.every((card) => card.suit === hand[0].suit);
+        const unique = Array.from(new Set(values));
+        if (unique.includes(14)) unique.unshift(1);
+        let straightHigh = 0;
+        for (let i = 0; i <= unique.length - 5; i += 1) {
+          const chunk = unique.slice(i, i + 5);
+          if (chunk.every((value, index) => index === 0 || value === chunk[index - 1] + 1)) {
+            straightHigh = Math.max(straightHigh, chunk[4]);
+          }
+        }
+        const high = values[values.length - 1] || 0;
+        if (straightHigh && flush) return 800 + straightHigh;
+        if (countValues[0] === 4) return 700 + high;
+        if (countValues[0] === 3 && countValues[1] === 2) return 600 + high;
+        if (flush) return 500 + high;
+        if (straightHigh) return 400 + straightHigh;
+        if (countValues[0] === 3) return 300 + high;
+        if (countValues[0] === 2 && countValues[1] === 2) return 200 + high;
+        if (countValues[0] === 2) return 100 + high;
+        return high;
+      }
+
+      function bestFive(cards) {
+        let best = cards.slice(0, 5);
+        let bestScore = pokerScore(best);
+        for (let a = 0; a < cards.length - 4; a += 1) {
+          for (let b = a + 1; b < cards.length - 3; b += 1) {
+            for (let c = b + 1; c < cards.length - 2; c += 1) {
+              for (let d = c + 1; d < cards.length - 1; d += 1) {
+                for (let e = d + 1; e < cards.length; e += 1) {
+                  const hand = [cards[a], cards[b], cards[c], cards[d], cards[e]];
+                  const score = pokerScore(hand);
+                  if (score > bestScore) {
+                    best = hand;
+                    bestScore = score;
+                  }
+                }
+              }
+            }
+          }
+        }
+        return { hand: best, score: bestScore, label: pokerRank(best) };
+      }
+
+      function settleBet(result, label) {
+        if (result > 0) {
+          points += stake * 2;
+          notice = `${label} 勝ち！ ${stake * 2} pt 獲得`;
+        } else if (result < 0) {
+          notice = `${label} 負け。次で取り返そう`;
+        } else {
+          points += stake;
+          notice = `${label} 引き分け。ベットを返しました`;
+        }
+        stake = 0;
+      }
+
+      function payBet() {
+        if (stake > 0) return true;
+        if (points < bet) {
+          notice = "ポイントが足りないのでベットできません";
+          return false;
+        }
+        points -= bet;
+        stake = bet;
+        return true;
+      }
+
       function blackjackValue(hand) {
         let total = 0;
         let aces = 0;
@@ -937,8 +1092,24 @@
       }
 
       function resetPoker() {
-        pokerHand = shuffle(deck()).slice(0, 5);
+        const cards = shuffle(deck());
+        pokerHand = cards.slice(0, 5);
+        pokerOpponent = cards.slice(5, 10);
         pokerHeld = [];
+        stake = 0;
+      }
+
+      function resetTexas() {
+        const cards = shuffle(deck());
+        texas = {
+          deck: cards.slice(9),
+          player: cards.slice(0, 2),
+          opponent: cards.slice(2, 4),
+          community: cards.slice(4, 9),
+          open: 0,
+          settled: false,
+        };
+        stake = 0;
       }
 
       function resetBlackjack() {
@@ -949,11 +1120,13 @@
           dealer: [cards[1], cards[3]],
           status: "playing",
         };
+        stake = 0;
       }
 
       function resetHighlow() {
         const cards = shuffle(deck());
         highlow = { current: cards[0], deck: cards.slice(1), streak: 0, message: "次のカードを予想" };
+        stake = 0;
       }
 
       function render() {
@@ -966,6 +1139,7 @@
         document.getElementById("playTime").textContent = selected.time;
         document.getElementById("sideTitle").textContent = selected.name;
         document.getElementById("sideCategory").textContent = selected.category;
+        renderBank();
         renderQuickActions();
         renderFilters();
         renderGames();
@@ -973,6 +1147,17 @@
         renderLobby();
         renderRules();
         renderGameArea();
+      }
+
+      function renderBank() {
+        const bank = document.getElementById("bankArea");
+        if (!bank) return;
+        bank.innerHTML = `<div class="bank-card"><strong>${points}</strong><span>ポイント</span></div>
+          <div class="bank-card"><strong>${bet}</strong><span>ベット</span></div>
+          <div class="bank-card"><strong>${stake}</strong><span>場のベット</span></div>
+          <div class="bet-controls">
+            ${[10, 50, 100, 200].map((amount) => `<button class="chip ${amount === bet ? "active" : ""}" type="button" data-bet="${amount}">${amount}</button>`).join("")}
+          </div>`;
       }
 
       function renderQuickActions() {
@@ -1006,6 +1191,7 @@
                 <span>${item.players}</span><span>${item.time}</span><span>${item.difficulty}</span>
                 ${item.localRules ? "<span>地域ルール</span>" : ""}
               </div>
+              <span class="btn secondary open-play">このゲームを開く</span>
             </button>`
           )
           .join("");
@@ -1043,12 +1229,45 @@
 
       function renderGameArea() {
         const area = document.getElementById("gameArea");
-        if (selected.id === "poker") {
+        if (selected.id === "draw-poker") {
+          const playerScore = pokerScore(pokerHand);
+          const opponentScore = pokerScore(pokerOpponent);
           area.innerHTML = `<div class="card-row">${pokerHand.map((card) => cardHtml(card, pokerHeld.includes(card.id))).join("")}</div>
-            <div class="status">現在の役: ${pokerRank(pokerHand)}</div>
+            <div class="table-zone">
+              <p class="zone-title">相手の5枚</p>
+              <div class="mini-row">${pokerOpponent.map((card) => cardHtml(card)).join("")}</div>
+            </div>
+            <div class="status">あなた: ${pokerRank(pokerHand)} / 相手: ${pokerRank(pokerOpponent)}</div>
             <div class="actions">
               <button class="btn" type="button" data-play="drawPoker">選んだカードを残す</button>
+              <button class="btn" type="button" data-play="settleDrawPoker">勝負する</button>
               <button class="btn secondary" type="button" data-play="resetPoker">配り直す</button>
+            </div>`;
+          return;
+        }
+        if (selected.id === "texas-holdem") {
+          const openCards = texas.community.slice(0, texas.open);
+          const playerBest = texas.open >= 5 ? bestFive([...texas.player, ...openCards]) : null;
+          const opponentBest = texas.open >= 5 ? bestFive([...texas.opponent, ...openCards]) : null;
+          area.innerHTML = `<div class="table-zone">
+              <p class="zone-title">あなたの手札2枚</p>
+              <div class="mini-row">${texas.player.map((card) => cardHtml(card)).join("")}</div>
+            </div>
+            <div class="table-zone">
+              <p class="zone-title">共通カード ${texas.open}/5</p>
+              <div class="mini-row">${openCards.map((card) => cardHtml(card)).join("") || "<span class='status'>まずフロップを開いてください</span>"}</div>
+            </div>
+            <div class="table-zone">
+              <p class="zone-title">相手の手札2枚</p>
+              <div class="mini-row">${texas.open >= 5 ? texas.opponent.map((card) => cardHtml(card)).join("") : "<span class='status'>リバー後に公開</span>"}</div>
+            </div>
+            <div class="status">${playerBest ? `あなた: ${playerBest.label} / 相手: ${opponentBest.label}` : "フロップ → ターン → リバーの順に開きます"}</div>
+            <div class="actions">
+              <button class="btn" type="button" data-play="flop" ${texas.open !== 0 ? "disabled" : ""}>フロップ3枚</button>
+              <button class="btn" type="button" data-play="turn" ${texas.open !== 3 ? "disabled" : ""}>ターン1枚</button>
+              <button class="btn" type="button" data-play="river" ${texas.open !== 4 ? "disabled" : ""}>リバー1枚</button>
+              <button class="btn" type="button" data-play="settleTexas" ${texas.open < 5 || texas.settled ? "disabled" : ""}>勝負する</button>
+              <button class="btn secondary" type="button" data-play="resetTexas">新しく</button>
             </div>`;
           return;
         }
@@ -1087,7 +1306,11 @@
         mode = selected.modes[0];
         roomCode = makeRoomCode();
         notice = `${selected.name} を選びました`;
+        currentView = "play";
+        if (selected.id === "draw-poker") resetPoker();
+        if (selected.id === "texas-holdem") resetTexas();
         render();
+        document.getElementById("top").scrollIntoView({ behavior: "smooth" });
       }
 
       function handlePress(event) {
@@ -1108,6 +1331,11 @@
         if (target.dataset.ai) {
           aiLevel = target.dataset.ai;
           notice = `AIの強さを ${aiLevel} にしました`;
+          render();
+        }
+        if (target.dataset.bet) {
+          bet = Number(target.dataset.bet);
+          notice = `ベットを ${bet} pt にしました`;
           render();
         }
         if (target.id === "refreshRoom") {
@@ -1148,10 +1376,46 @@
           const cards = shuffle(deck()).filter((card) => !pokerHand.some((held) => held.id === card.id));
           pokerHand = pokerHand.map((card) => (pokerHeld.includes(card.id) ? card : cards.pop()));
           pokerHeld = [];
-          notice = "カードを交換しました";
+          notice = "カードを交換しました。勝負するとベットします";
+        }
+        if (action === "settleDrawPoker") {
+          if (!payBet()) {
+            render();
+            return;
+          }
+          const result = pokerScore(pokerHand) > pokerScore(pokerOpponent) ? 1 : pokerScore(pokerHand) < pokerScore(pokerOpponent) ? -1 : 0;
+          settleBet(result, "5枚ドロー");
         }
         if (action === "resetPoker") resetPoker();
+        if (action === "flop") {
+          if (!payBet()) {
+            render();
+            return;
+          }
+          texas.open = 3;
+          notice = `${bet} pt ベットしてフロップを開きました`;
+        }
+        if (action === "turn") {
+          texas.open = 4;
+          notice = "ターンを開きました";
+        }
+        if (action === "river") {
+          texas.open = 5;
+          notice = "リバーを開きました。勝負できます";
+        }
+        if (action === "settleTexas") {
+          const playerBest = bestFive([...texas.player, ...texas.community]);
+          const opponentBest = bestFive([...texas.opponent, ...texas.community]);
+          const result = playerBest.score > opponentBest.score ? 1 : playerBest.score < opponentBest.score ? -1 : 0;
+          texas.settled = true;
+          settleBet(result, "テキサスホールデム");
+        }
+        if (action === "resetTexas") resetTexas();
         if (action === "hit") {
+          if (blackjack.status === "playing" && blackjack.player.length === 2 && !payBet()) {
+            render();
+            return;
+          }
           blackjack.player.push(blackjack.deck.pop());
           if (blackjackValue(blackjack.player) > 21) blackjack.status = "バースト";
         }
@@ -1160,21 +1424,36 @@
           const player = blackjackValue(blackjack.player);
           const dealer = blackjackValue(blackjack.dealer);
           blackjack.status = dealer > 21 || player > dealer ? "あなたの勝ち" : dealer === player ? "引き分け" : "ディーラーの勝ち";
+          settleBet(blackjack.status === "あなたの勝ち" ? 1 : blackjack.status === "引き分け" ? 0 : -1, "ブラックジャック");
         }
         if (action === "resetBlackjack") resetBlackjack();
         if (action === "high" || action === "low") {
+          if (!payBet()) {
+            render();
+            return;
+          }
           const next = highlow.deck.pop();
           const correct = action === "high" ? next.value > highlow.current.value : next.value < highlow.current.value;
           highlow.current = next;
           highlow.streak = correct ? highlow.streak + 1 : 0;
           highlow.message = `${suitInfo(next).mark}${next.rank}: ${correct ? "正解" : "はずれ"}`;
+          settleBet(correct ? 1 : -1, "ハイ&ロー");
         }
         if (action === "resetHighlow") resetHighlow();
-        if (action === "war") warScore += Math.random() > 0.5 ? 1 : -1;
+        if (action === "war") {
+          if (!payBet()) {
+            render();
+            return;
+          }
+          const result = Math.random() > 0.5 ? 1 : -1;
+          warScore += result;
+          settleBet(result, "戦争");
+        }
         render();
       }
 
       resetPoker();
+      resetTexas();
       resetBlackjack();
       resetHighlow();
       render();
